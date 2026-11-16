@@ -10,27 +10,21 @@ use crate::{RawPtrOps, alloc::ALLOC, constants::PAGES, modules::page::Page};
 /// Allocate memory to the heap
 ///
 /// ## Allocation
-/// Allocates memory at least equivalent
-/// to `bytes`, aligned to the nearest
-/// page size greater than or equal to `bytes`
-///
-/// Page sizes are either
+/// Allocates memory equivalent
+/// to `bytes`
 /// 
-/// - 16
-/// - 32
-/// - 64
-/// - 128
-/// 
-/// bytes large
-/// 
-/// ## Notes
-/// `T` is irrelevant to the allocated size,
-/// and is only useful to the caller so they
-/// can perform operations on the data
+/// ## Optional
+/// If `bytes` is `None` then `bytes`
+/// will become `size_of::<T>()`, otherwise
+/// it will be `bytes` regardless of `T`,
+/// in which case T becomes useful only for
+/// performing operations on the data
 /// 
 /// It does not guarantee that `T` will
 /// fit in the requested `bytes`
-pub fn malloc<T>(bytes: usize) -> *mut T {
+pub fn malloc<T>(bytes: Option<usize>) -> *mut T {
+    let bytes = bytes.unwrap_or_else(|| size_of::<T>());
+
     let pages = unsafe {
         ALLOC.pages[0..PAGES]
             .as_mut_ptr()
