@@ -3,7 +3,9 @@
 //! Public standalone functions
 //!
 
-use crate::alloc::ALLOC;
+use core::ptr::null_mut;
+
+use crate::{RawPtrOps, alloc::ALLOC, constants::PAGES, modules::page::Page};
 
 /// Allocate memory to the heap
 ///
@@ -25,12 +27,33 @@ use crate::alloc::ALLOC;
 /// `T` is irrelevant to the allocated size,
 /// and is only useful to the caller so they
 /// can perform operations on the data
+/// 
+/// It does not guarantee that `T` will
+/// fit in the requested `bytes`
 pub fn malloc<T>(bytes: usize) -> *mut T {
-    unsafe {
-        ALLOC.heap[0..bytes]
-        .as_mut_ptr()
-        .cast()
+    let pages = unsafe {
+        ALLOC.pages[0..PAGES]
+            .as_mut_ptr()
+            .cast::<[Page; PAGES]>()
+    };
+
+    for (idx, page) in pages.get().iter().enumerate() {
+        if page.is_free() {
+            let index = page.index();
+            unsafe {
+                (*ALLOC.pages[idx..idx].as_mut_ptr())
+                    .toggle_free();
+            }
+
+            return unsafe {
+                ALLOC.heap[index..(index + bytes)]
+                .as_mut_ptr()
+                .cast()
+            }
+        }
     }
+
+    null_mut::<T>().cast()
 }
 
 /// Deallocate memory at the

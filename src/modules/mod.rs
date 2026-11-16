@@ -5,4 +5,5 @@
 //! 
 
 pub(crate) mod alignment;
+pub(crate) mod page;
 pub mod ops;

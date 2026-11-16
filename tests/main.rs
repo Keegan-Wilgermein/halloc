@@ -13,6 +13,10 @@ fn main() {
     ptr.set([255, 255, 255, 255]);
     println!("{:?}", ptr.get());
 
+    println!("Addr 1: {}", ptr.addr());
+
     let ptr2 = malloc::<u32>(4);
     println!("{:?}", ptr2.get());
+
+    println!("Addr 2: {}", ptr2.addr());
 }
