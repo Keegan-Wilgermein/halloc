@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "minmalloc"
+name = "halloc"
 version = "0.1.0"
