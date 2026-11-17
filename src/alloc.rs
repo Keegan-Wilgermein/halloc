@@ -3,9 +3,8 @@
 //! Global allocator
 //!
 
-use crate::constants::PAGE_SIZE;
 #[cfg(not(feature = "std"))]
-use crate::{constants::{HEAP_SIZE, PAGES}, modules::page::Page};
+use crate::{constants::{HEAP_SIZE, PAGE_SIZE, PAGES}, modules::page::Page};
 
 /// Global allocator
 pub(crate) static mut ALLOC: Alloc = Alloc::new();

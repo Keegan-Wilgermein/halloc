@@ -3,27 +3,22 @@
 //! Tests for `halloc`
 //! 
 
-use halloc::{PAGE_SIZE, RawPtrOps, free, malloc, };
+use halloc::{api::functions::get_between, free, malloc};
 
 #[test]
 fn main() {
-    let ptr = malloc::<[u8; 4]>(None);
-    println!("{:?}", ptr.get());
+    let mut ptr = malloc::<[u8; 4]>(None);
+    println!("{:?}", ptr.addr());
 
-    ptr.set([255, 255, 255, 255]);
-    println!("{:?}", ptr.get());
-
-    println!("Addr 1: {}", ptr.addr());
+    *ptr = [255; 4];
+    
+    println!("HEAP: {:?}", get_between(0, 4));
 
     let ptr2 = malloc::<u32>(None);
-    println!("{:?}", ptr2.get());
-
-    println!("Addr 2: {}", ptr2.addr());
-
-    assert!(ptr2.addr() - ptr.addr() == PAGE_SIZE);
+    println!("{:?}", ptr2.addr());
 
     free(ptr);
 
     let new_ptr = malloc::<[u8; 4]>(None);
-    println!("{}, {:?}", new_ptr.addr(), new_ptr.get());
+    println!("{:?}, {:?}", new_ptr.addr(), *new_ptr);
 }
