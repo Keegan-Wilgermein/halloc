@@ -2,9 +2,8 @@
 name = "halloc"
 version = "0.1.0"
 edition = "2024"
+description = "no_std heap allocator"
 
 [features]
-default = ["std"]
-std = []
 
 [dependencies]

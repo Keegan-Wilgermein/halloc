@@ -6,7 +6,6 @@
 /// The size of the heap in bytes
 /// 
 /// Defaults to 64 kilobytes
-#[cfg(not(feature = "std"))]
 pub const HEAP_SIZE: usize = PAGE_SIZE * PAGES;
 
 /// The amount of pages in the heap

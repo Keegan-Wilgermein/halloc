@@ -28,6 +28,18 @@ impl<T> DerefMut for Pointer<T> {
     }
 }
 
+impl<T> AsRef<T> for Pointer<T> {
+    fn as_ref(&self) -> &T {
+        &*self
+    }
+}
+
+impl<T> AsMut<T> for Pointer<T> {
+    fn as_mut(&mut self) -> &mut T {
+        &mut *self
+    }
+}
+
 impl<T> From<*mut T> for Pointer<T> {
     fn from(value: *mut T) -> Self {
         Self(value)
@@ -51,5 +63,29 @@ impl<T> Pointer<T> {
     /// `Pointer<T>` is null
     pub fn is_null(&self) -> bool {
         self.0.is_null()
+    }
+
+    /// Casts a pointer into a
+    /// pointer of another type
+    /// 
+    /// ## Returns
+    /// Returns `Ok()` if the
+    /// size of `U` is the same
+    /// as `T`, otherwise it
+    /// returns `Err()` containing 
+    ///the original pointer
+    pub fn cast<U>(self)-> Result<Pointer<U>, Self> {
+        if size_of::<T>() == size_of::<U>() {
+            Ok(self.0.cast::<U>().into())
+        } else {
+            Err(self)
+        }
+    }
+
+    /// Casts a pointer into a
+    /// pointer of another type
+    /// without bounds checking
+    pub fn cast_unchecked<U>(&self) -> Pointer<U> {
+        self.0.cast::<U>().into()
     }
 }

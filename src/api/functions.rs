@@ -10,20 +10,10 @@ use crate::{PAGE_SIZE, RawPtrOps, alloc::ALLOC, api::pointer::Pointer, constants
 /// Allocate memory to the heap
 ///
 /// ## Allocation
-/// Allocates memory equivalent
-/// to `bytes`
-/// 
-/// ## Optional
-/// If `bytes` is `None` then `bytes`
-/// will become `size_of::<T>()`, otherwise
-/// it will be `bytes` regardless of `T`,
-/// in which case T becomes useful only for
-/// performing operations on the data
-/// 
-/// It does not guarantee that `T` will
-/// fit in the requested `bytes`
-pub fn malloc<T>(bytes: Option<usize>) -> Pointer<T> {
-    let bytes = bytes.unwrap_or_else(|| size_of::<T>());
+/// Allocates memory at least equivalent
+/// to `size_of::<T>()`
+pub fn malloc<T>() -> Pointer<T> {
+    let bytes = size_of::<T>();
 
     let pages = unsafe {
         ALLOC.pages[0..PAGES]

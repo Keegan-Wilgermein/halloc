@@ -7,18 +7,18 @@ use halloc::{api::functions::get_between, free, malloc};
 
 #[test]
 fn main() {
-    let mut ptr = malloc::<[u8; 4]>(None);
+    let mut ptr = malloc::<[u8; 4]>();
     println!("ADDR 1: {:?}", ptr.addr());
 
     *ptr = [255; 4];
     
     println!("HEAP: {:?}", get_between(0, 4));
 
-    let ptr2 = malloc::<u32>(None);
+    let ptr2 = malloc::<u32>();
     println!("ADDR 2: {:?}", ptr2.addr());
 
     free(ptr);
 
-    let new_ptr = malloc::<[u8; 4]>(None);
+    let new_ptr = malloc::<[u8; 4]>();
     println!("NEW: {:?}, {:?}", new_ptr.addr(), *new_ptr);
 }

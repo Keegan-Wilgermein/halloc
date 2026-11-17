@@ -4,7 +4,7 @@
 //! heap allocator for Rust
 //!
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 // Mod
 
