@@ -46,4 +46,10 @@ impl<T> Pointer<T> {
     pub fn addr(&self) -> usize {
         self.0.addr()
     }
+
+    /// Returns `true` if
+    /// `Pointer<T>` is null
+    pub fn is_null(&self) -> bool {
+        self.0.is_null()
+    }
 }

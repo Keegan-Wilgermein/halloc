@@ -22,7 +22,7 @@ use crate::{PAGE_SIZE, RawPtrOps, alloc::ALLOC, api::pointer::Pointer, constants
 /// 
 /// It does not guarantee that `T` will
 /// fit in the requested `bytes`
-pub fn malloc<'a, T>(bytes: Option<usize>) -> Pointer<T> {
+pub fn malloc<T>(bytes: Option<usize>) -> Pointer<T> {
     let bytes = bytes.unwrap_or_else(|| size_of::<T>());
 
     let pages = unsafe {
@@ -31,11 +31,18 @@ pub fn malloc<'a, T>(bytes: Option<usize>) -> Pointer<T> {
             .cast::<[Page; PAGES]>()
     };
 
-    for page in pages.get()
-        .iter_mut() {
+    for (idx, page) in pages.get()
+        .iter()
+        .enumerate() {
         if page.is_free() {
             let index = page.index();
-            page.toggle_free();
+
+            unsafe {
+                (&raw mut ALLOC.pages)
+                    .as_mut_unchecked()
+                    [idx]
+                    .toggle_free();
+            }
 
             return unsafe {
                 ALLOC.heap[index..(index + bytes)]
@@ -63,8 +70,10 @@ pub fn free<T>(ptr: impl Into<*mut T>) {
 
     let offset = (ptr_addr - start) / PAGE_SIZE;
     unsafe {
-        (*ALLOC.pages[offset..offset]
-            .as_mut_ptr()).toggle_free();
+        (&raw mut ALLOC.pages)
+        .as_mut_unchecked()
+        [offset]
+        .toggle_free();
     }
 }
 
