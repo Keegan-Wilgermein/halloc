@@ -5,7 +5,7 @@
 
 use core::ptr::null_mut;
 
-use crate::{PAGE_SIZE, RawPtrOps, alloc::ALLOC, api::pointer::Pointer, constants::PAGES, modules::page::Page};
+use crate::{PAGE_SIZE, alloc::ALLOC, api::pointer::Pointer, modules::ops::{RawPtrOpsRead}};
 
 /// Allocate memory to the heap
 ///
@@ -15,37 +15,31 @@ use crate::{PAGE_SIZE, RawPtrOps, alloc::ALLOC, api::pointer::Pointer, constants
 pub fn malloc<T>() -> Pointer<T> {
     let bytes = size_of::<T>();
 
-    let pages = unsafe {
-        ALLOC.pages[0..PAGES]
-            .as_mut_ptr()
-            .cast::<[Page; PAGES]>()
+    let link_ptr = unsafe {
+        (&raw mut ALLOC.free)
     };
 
-    for (idx, page) in pages.get()
-        .iter()
-        .enumerate() {
-        if page.is_free() {
-            let index = page.index();
+    let link = link_ptr.get();
 
-            unsafe {
-                (&raw mut ALLOC.pages)
-                    .as_mut_unchecked()
-                    [idx]
-                    .toggle_free();
-            }
+    let page_idx = match link.next_free() {
+        Some(idx) => idx,
+        None => return null_mut::<T>().into(),
+    };
 
-            return unsafe {
-                ALLOC.heap[index..(index + bytes)]
-                    .as_mut_ptr()
-            }
-            .cast::<T>()
-            .into()
-        }
+    let heap_idx = link[page_idx]
+        .page()
+        .index();
+
+    unsafe {
+        &mut *link_ptr
+    }.unlink(page_idx);
+
+    return unsafe {
+        ALLOC.heap[heap_idx..(heap_idx + bytes)]
+            .as_mut_ptr()
     }
-
-    null_mut::<T>()
     .cast::<T>()
-    .into()
+    .into();
 }
 
 /// Deallocate memory at the
@@ -59,12 +53,11 @@ pub fn free<T>(ptr: impl Into<*mut T>) {
     };
 
     let offset = (ptr_addr - start) / PAGE_SIZE;
+
     unsafe {
-        (&raw mut ALLOC.pages)
-        .as_mut_unchecked()
-        [offset]
-        .toggle_free();
-    }
+        (&raw mut ALLOC.free)
+            .as_mut_unchecked()
+    }.link(offset);
 }
 
 pub fn get_between(index1: usize, index2: usize) -> &'static [u8] {

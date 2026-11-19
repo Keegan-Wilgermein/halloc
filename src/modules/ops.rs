@@ -3,21 +3,20 @@
 //! Raw pointer operations
 //! 
 
-/// Raw pointer operations
-pub trait RawPtrOps<T> {
+/// Raw pointer read operations
+pub trait RawPtrOpsRead<T> {
     /// Reads a pointers value
     fn get(&self) -> T;
-
-    /// Sets a pointers value
-    fn set(&self, value: T);
 }
 
-impl<T> RawPtrOps<T> for *mut T {
+impl<T> RawPtrOpsRead<T> for *mut T {
     fn get(&self) -> T {
         unsafe { self.read() }
     }
+}
 
-    fn set(&self, value: T) {
-        unsafe { self.write(value) }
+impl<T> RawPtrOpsRead<T> for *const T {
+    fn get(&self) -> T {
+        unsafe { self.read() }
     }
 }

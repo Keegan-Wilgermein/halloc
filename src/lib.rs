@@ -21,5 +21,3 @@ pub use api::functions::malloc;
 pub use constants::HEAP_SIZE;
 pub use constants::PAGE_SIZE;
 pub use constants::PAGES;
-
-pub use modules::ops::RawPtrOps;

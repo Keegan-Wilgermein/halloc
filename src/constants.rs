@@ -25,7 +25,7 @@ pub const PAGES: usize = match option_env!("PAGES") {
 pub const PAGE_SIZE: usize = match option_env!("PAGE_SIZE") {
     Some(string) => match usize::from_str_radix(string, 10) {
         Ok(size) => size.next_power_of_two(),
-        Err(_) => panic!("PAGE_SIZE must be a usize"),
+        Err(_) => panic!("PAGE_SIZE must be a valid usize"),
     },
     None => 1024,
 };

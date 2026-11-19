@@ -5,4 +5,6 @@
 //! 
 
 pub(crate) mod page;
+pub(crate) mod bit_mask_array;
+pub(crate) mod linked_array;
 pub mod ops;
